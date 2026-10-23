@@ -108,6 +108,7 @@ async function placeOrder(id){
  const p=products.find(x=>x.id===id);if(!p)return;
  const name=$('name-'+id).value.trim(),phone=$('phone-'+id).value.replace(/\s/g,'').trim(),qty=Number($('qty-'+id).value);
  if(name.length<2){flash('이름을 2자 이상 입력해 주세요.',true);return}
+  alert('이름 확인 단계 통과!');
  if(!/^01[016789]-?\d{3,4}-?\d{4}$/.test(phone)){flash('전화번호를 확인해 주세요. 예: 010-1234-5678',true);return}
  if(!Number.isInteger(qty)||qty<1||qty>available(p)){flash('신청 수량 또는 남은 재고를 확인해 주세요.',true);return}
  const btn=document.querySelector(`button[onclick="placeOrder('${id}')"]`);if(btn){btn.disabled=true;btn.textContent='접수 중…'}
