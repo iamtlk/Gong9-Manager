@@ -73,8 +73,8 @@
 SETUP: Fill SUPABASE_URL and SUPABASE_ANON_KEY below with your Supabase project's
 Project URL and publishable/anon key. Never put a service_role key in this file.
 */
-const SUPABASE_URL = "YOUR_SUPABASE_PROJECT_URL";
-const SUPABASE_ANON_KEY = "YOUR_SUPABASE_PUBLISHABLE_OR_ANON_KEY";
+const SUPABASE_URL = "https://tghtihpfwiuimieezvxd.supabase.co";
+const SUPABASE_ANON_KEY = "sb_publishable_-ioPEKQ9KzHyDa5-KO07Pw_HfAQwx5f";
 const configured = SUPABASE_URL.startsWith("https://") && !SUPABASE_URL.includes("YOUR_") && !SUPABASE_ANON_KEY.includes("YOUR_");
 const client = configured && window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
 let products=[], orders=[], editingProduct=null, currentUser=null, channel=null;
