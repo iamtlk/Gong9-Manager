@@ -102,6 +102,7 @@ async function refreshAll(){
  renderProducts();if(currentUser)renderAdmin();
 }
 async function placeOrder(id){
+  alert('신청 버튼이 실행됐어요!');
  if(!client){flash('먼저 데이터베이스 연결 설정이 필요합니다.',true);return}
  const p=products.find(x=>x.id===id);if(!p)return;
  const name=$('name-'+id).value.trim(),phone=$('phone-'+id).value.replace(/\s/g,'').trim(),qty=Number($('qty-'+id).value);
@@ -116,7 +117,6 @@ async function placeOrder(id){
  await refreshAll();
 }
 window.placeOrder=placeOrder;
-alert('신청 버튼 연결 확인!');
 $('loginBtn').addEventListener('click',async()=>{
  if(!client){$('loginMsg').textContent='먼저 Supabase 연결 설정을 완료해 주세요.';return}
  $('loginMsg').textContent='로그인 중…';
