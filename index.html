@@ -101,46 +101,78 @@ async function refreshAll(){
  orders=currentUser?(or.data||[]):[];
  renderProducts();if(currentUser)renderAdmin();
 }
-async function placeOrder(id){
- if(!client){flash('먼저 데이터베이스 연결 설정이 필요합니다.',true);return}
- const p=products.find(x=>x.id===id);if(!p)return;
- const name=$('name-'+id).value.trim(),phone=$('phone-'+id).value.replace(/\s/g,'').trim(),qty=Number($('qty-'+id).value);
- if(name.length<2){flash('이름을 2자 이상 입력해 주세요.',true);return}
- const phoneDigits = phone.replace(/\D/g, '');
 
-if (!/^01[016789]\d{7,8}$/.test(phoneDigits)) {
-  flash('전화번호를 확인해 주세요. 예: 01012345678', true);return;}
- if(!Number.isInteger(qty)||qty<1||qty>available(p)){flash('신청 수량 또는 남은 재고를 확인해 주세요.',true);return}
- const btn=document.querySelector(`button[onclick="placeOrder('${id}')"]`);if(btn){btn.disabled=true;btn.textContent='접수 중…'}
-let data, error;
-
-try {
-  ({ data, error } = await client.rpc('place_gonggu_order', {
-    p_product_id: id,
-    p_customer_name: name,
-    p_customer_phone: phoneDigits,
-    p_quantity: qty
-  }));
-} catch (e) {
-  error = e;
-}
-
-if (error) {
-  console.error('주문 접수 오류:', error);
-  flash('주문 접수 실패: ' + (error.message || '연결 또는 서버 오류'), true);
-  if (btn) {
-    btn.disabled = false;
-    btn.textContent = '공동구매 신청하기';
+async function placeOrder(id) {
+  if (!client) {
+    flash('데이터베이스 연결을 확인해 주세요.', true);
+    return;
   }
-  return;
+
+  const p = products.find(x => String(x.id) === String(id));
+  if (!p) {
+    flash('상품 정보를 찾지 못했어요. 페이지를 새로고침해 주세요.', true);
+    return;
+  }
+
+  const name = $('name-' + id).value.trim();
+  const phone = $('phone-' + id).value.trim();
+  const phoneDigits = phone.replace(/\D/g, '');
+  const qty = Number($('qty-' + id).value);
+
+  if (name.length < 2) {
+    flash('이름을 2자 이상 입력해 주세요.', true);
+    return;
+  }
+
+  if (!/^01[016789]\d{7,8}$/.test(phoneDigits)) {
+    flash('전화번호를 확인해 주세요. 예: 010-1234-5678', true);
+    return;
+  }
+
+  if (!Number.isInteger(qty) || qty < 1 || qty > available(p)) {
+    flash('신청 수량 또는 남은 재고를 확인해 주세요.', true);
+    return;
+  }
+
+  const btn = document.querySelector(
+    `button[onclick="placeOrder('${id}')"]`
+  );
+
+  if (btn) {
+    btn.disabled = true;
+    btn.textContent = '접수 중…';
+  }
+
+  try {
+    const { data, error } = await client.rpc('place_gonggu_order', {
+      p_product_id: p.id,
+      p_customer_name: name,
+      p_customer_phone: phoneDigits,
+      p_quantity: qty
+    });
+
+    if (error) {
+      console.error('주문 접수 오류:', error);
+      flash('주문 접수 실패: ' + error.message, true);
+      return;
+    }
+
+    flash('신청이 접수됐어요! 주문번호: ' + data);
+    await refreshAll();
+
+  } catch (e) {
+    console.error('주문 처리 오류:', e);
+    flash('오류가 발생했어요: ' + (e.message || e), true);
+
+  } finally {
+    if (btn) {
+      btn.disabled = false;
+      btn.textContent = '공동구매 신청하기';
+    }
+  }
 }
 
- if(btn){btn.disabled=false;btn.textContent='공동구매 신청하기'}
- if(error){console.error(error);flash(error.message.includes('INSUFFICIENT_STOCK')?'재고가 부족해요. 최신 수량을 확인해 주세요.':'주문 접수에 실패했어요. 잠시 후 다시 시도해 주세요.',true);await refreshAll();return}
- flash(`신청이 접수됐어요! 주문번호: ${data}. 판매자가 입금 안내를 드릴 예정입니다.`);
- await refreshAll();
-}
-window.placeOrder=placeOrder;
+window.placeOrder = placeOrder;
 $('loginBtn').addEventListener('click',async()=>{
  if(!client){$('loginMsg').textContent='먼저 Supabase 연결 설정을 완료해 주세요.';return}
  $('loginMsg').textContent='로그인 중…';
