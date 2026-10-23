@@ -103,6 +103,7 @@ async function refreshAll(){
 }
 async function placeOrder(id){
   alert('신청 버튼이 실행됐어요!');
+  alert('상품 확인 단계 통과!');
  if(!client){flash('먼저 데이터베이스 연결 설정이 필요합니다.',true);return}
  const p=products.find(x=>x.id===id);if(!p)return;
  const name=$('name-'+id).value.trim(),phone=$('phone-'+id).value.replace(/\s/g,'').trim(),qty=Number($('qty-'+id).value);
