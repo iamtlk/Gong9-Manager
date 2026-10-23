@@ -116,6 +116,7 @@ async function placeOrder(id){
  await refreshAll();
 }
 window.placeOrder=placeOrder;
+alert('신청 버튼 연결 확인!');
 $('loginBtn').addEventListener('click',async()=>{
  if(!client){$('loginMsg').textContent='먼저 Supabase 연결 설정을 완료해 주세요.';return}
  $('loginMsg').textContent='로그인 중…';
